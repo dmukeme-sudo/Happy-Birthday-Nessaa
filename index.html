@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 19th Birthday Vanessa! 🎉</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', serif;
+            overflow-x: hidden;
+            perspective: 1500px;
+            padding: 20px;
+        }
+
+        /* Feestelijke Vlaggetjesslinger (Bovenaan het scherm) */
+        .bunting {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .flag {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 45px solid #ff4081;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+        }
+
+        .flag:nth-child(2n) { border-top-color: #ffd700; }
+        .flag:nth-child(3n) { border-top-color: #ff758f; }
+        .flag:nth-child(4n) { border-top-color: #ffffff; }
+
+        /* Zwevende Hartjes & Sterren op de achtergrond */
+        .bg-element {
+            position: fixed;
+            color: rgba(255, 64, 129, 0.4);
+            font-size: 26px;
+            animation: floatUp 6s infinite ease-in;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg) scale(0.8); opacity: 0; }
+            50% { opacity: 0.9; }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        /* Kaart Container */
+        .card-container {
+            position: relative;
+            width: 380px;
+            height: 560px;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 1s ease;
+            margin-top: 20px;
+        }
+
+        /* Linkerpagina (Binnenkant met de Brief) */
+        .left-page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #fffdfa;
+            border-radius: 20px;
+            border: 3px solid #ff80ab;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            padding: 30px 22px 25px 22px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+            background-image: radial-gradient(#ffccd5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .banner-header {
+            text-align: center;
+            background: #ffe6ed;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px dashed #ff4081;
+        }
+
+        .banner-header h2 {
+            color: #d81b60;
+            font-size: 16px;
+        }
+
+        .banner-header .flags-icon {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        /* Scrollbalk voor de brief */
+        .scrollable-letter {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+            font-size: 13.5px;
+            color: #333333;
+            line-height: 1.85;
+            text-align: left;
+        }
+
+        .scrollable-letter p {
+            margin-bottom: 14px;
+            text-indent: 12px;
+        }
+
+        .scrollable-letter p:first-of-type {
+            text-indent: 0;
+        }
+
+        .scrollable-letter::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollable-letter::-webkit-scrollbar-track {
+            background: #ffe6ed;
+            border-radius: 10px;
+        }
+        .scrollable-letter::-webkit-scrollbar-thumb {
+            background: #ff4081;
+            border-radius: 10px;
+        }
+
+        .signature {
+            text-align: center;
+            font-weight: bold;
+            color: #d81b60;
+            font-size: 17px;
+            margin-top: 15px;
+            padding-bottom: 10px;
+        }
+
+        /* Voorkant / Kaft van de Kaart */
+        .cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #ff4081, #c9184a);
+            border-radius: 20px;
+            border: 4px solid #ffffff;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            backface-visibility: hidden;
+            overflow: hidden;
+        }
+
+        /* Decoratief Lint op de Kaft */
+        .ribbon-v {
+            position: absolute;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 2px dashed rgba(255,255,255,0.5);
+            border-right: 2px dashed rgba(255,255,255,0.5);
+        }
+
+        .cover h1 {
+            font-size: 27px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 3;
+        }
+
+        .cover p {
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            opacity: 0.95;
+            z-index: 3;
+            background: rgba(0,0,0,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .seal {
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(135deg, #ffd700, #ffa000);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            margin-top: 25px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            border: 2px solid #fff;
+            animation: pulse 2s infinite;
+            z-index: 3;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        /* Klapanimatie naar Links */
+        .card-container.open .cover {
+            transform: rotateY(-140deg);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Vlaggetjesslinger Bovenin -->
+    <div class="bunting">
+        <div class="flag"></div>
+        <div class="flag"></div>
+        <div class="flag"></div>
+        <div class="flag"></div>
+        <div class="flag"></div>
+        <div class="flag"></div>
+        <div class="flag"></div>
+        <div class="flag"></div>
+        <div class="flag"></div>
+    </div>
+
+    <!-- Zwevende Decoratie (Hartjes, Sterren, Ballonnen) -->
+    <div class="bg-element" style="left: 8%; animation-delay: 0s;">💖</div>
+    <div class="bg-element" style="left: 22%; animation-delay: 2s;">🎈</div>
+    <div class="bg-element" style="left: 45%; animation-delay: 4s;">✨</div>
+    <div class="bg-element" style="left: 68%; animation-delay: 1s;">❤️</div>
+    <div class="bg-element" style="left: 88%; animation-delay: 3s;">🎉</div>
+
+    <!-- Kaart -->
+    <div class="card-container" id="card" onclick="openCard()">
+        
+        <!-- Voorkant / Kaft -->
+        <div class="cover">
+            <div class="ribbon-v"></div>
+            <h1>Happy 19th Birthday Vanessa! 🎈</h1>
+            <p>KLIK OM TE OPENEN 🎁</p>
+            <div class="seal">💛</div>
+        </div>
+
+        <!-- Binnenkant (Brief) -->
+        <div class="left-page">
+            <div class="banner-header">
+                <div class="flags-icon">🎉 🎈 💖 🎈 🎉</div>
+                <h2>To the girl that holds my heart, Vanessa ❤️</h2>
+            </div>
+            
+            <div class="scrollable-letter">
+                <p>Honestly, I don't think I'll ever stop being grateful that I got to know you. Who would've thought that things would turn out the way they have? It's funny how life works, but God truly works in miraculous ways. We went from barely talking, to saying hi, to getting each other's socials, to going out, and now look at us, a couple. When I think about it, it's actually crazy how far we've come. I'm so happy I got to experience that little journey with you, because if there was anyone I'd want it to be with, it would be you.</p>
+
+                <p>This year hasn't exactly been the easiest for me. I've lost family members along the way, as well as people I thought would be there but who weren't meant to continue the journey with me. But somehow, getting to know you changed the direction of my year in ways I probably can't fully explain. You've brought me a kind of happiness and comfort I didn't even realise I needed. Thank you for always supporting me, for listening, for being there and, most importantly, for never making me feel judged. I appreciate that more than you know. Having someone I can be myself around without feeling like I have to explain or defend everything means a lot to me.</p>
+
+                <p>I hope you never underestimate how much you mean to me. I'm genuinely grateful for the person you are and for the memories we've already made. If there's one thing I'm certain about, it's that meeting you was one of the unexpected blessings of this year, and I wouldn't change the way our story started for anything.</p>
+
+                <p>I pray that God blesses you with divine long life, good health, favour and prosperity. May He continue to guide your steps, open doors that no one can shut and grant you the desires of your heart. Whatever obstacles may come your way, I pray that you overcome every single one of them in Jesus' Name. Amen. May this new chapter bring you nothing but growth, peace, happiness and endless blessings. I pray that 19 treats you beautifully and that you have countless reasons to smile.</p>
+
+                <p><strong>Happy 19th birthday, Vanessa.</strong> Here's to many more birthdays, more memories, more adventures and many more chapters together. I'm so grateful that out of all the ways life could have gone, ours somehow crossed paths.</p>
+
+                <div class="signature">I love you. ❤️</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let isOpen = false;
+
+        function openCard() {
+            const card = document.getElementById('card');
+            card.classList.toggle('open');
+            isOpen = !isOpen;
+
+            if (isOpen) {
+                // Feestelijke confetti bij het openen
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
